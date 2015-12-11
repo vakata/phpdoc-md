@@ -7,11 +7,13 @@ use ReflectionClass;
 class ClassInfo extends Phtml
 {
     private $reflectionClass;
+    private $classes;
 
-    public function __construct(ReflectionClass $class)
+    public function __construct(ReflectionClass $class, array $classes)
     {
         $this->setTemplate(__DIR__.'/../../../tpl/github.class.phtml');
         $this->reflectionClass = $class;
+        $this->classes = $classes;
     }
 
     public function render()
@@ -23,6 +25,7 @@ class ClassInfo extends Phtml
                 'classShortName' => $this->reflectionClass->getShortName(),
                 'methods' => $parser->getMethodsDetails(),
                 'classDescription' => $parser->getClassDescription(),
+                'classes' => $this->classes
             ]
         );
         return parent::render();

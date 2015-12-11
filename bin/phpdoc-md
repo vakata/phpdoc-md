@@ -43,13 +43,27 @@ switch ($config->format) {
         $readme = new Markdown\GitHub\Readme($config->rootNamespace);
 }
 
+$temp = [];
+foreach ($config->classes as $class) {
+    $reflection = new ReflectionClass($class);
+    $temp[$class] = ltrim(
+        namespaceToPath(
+            removeRootNamespace(
+                $reflection->getName(),
+                $config->rootNamespace
+            )
+        ) . '.md',
+        '/'
+    );
+}
+
 foreach ($config->classes as $class) {
     $reflection = new ReflectionClass($class);
     $destDir = getDestinationDirectory($reflection, $config->rootNamespace, $config->destDirectory);
     $destFile = sprintf('%s.md', $reflection->getShortName());
     switch ($config->format) {
         default:
-            $markDown = new Markdown\GitHub\ClassInfo($reflection);
+            $markDown = new Markdown\GitHub\ClassInfo($reflection, $temp);
     }
 
     file_exists($destDir) ?: mkdir($destDir, 0777, true);

@@ -1,10 +1,10 @@
-# <?= $this->className ?>  
+# <?= $this->className ?>
 
 <?= $this->classDescription->short ?>
 
 <?php if ($this->classDescription->long) : ?>
 
-<?= $this->classDescription->long ?>  
+<?= $this->classDescription->long ?>
 <?php endif ?>
 
 ## Methods
@@ -12,46 +12,38 @@
 | Name | Description |
 |------|-------------|
 <?php foreach ($this->methods as $name => $info) : ?>
-|[<?= $name ?>](#<?= strtolower($this->classShortName.$name) ?>)|<?= $info->shortDescription ?>|
+|[<?= $name ?>](#<?= strtolower($this->className.$name) ?>)|<?= $info->shortDescription ?>|
 <?php endforeach ?>
+
+---
+
 
 <?php foreach ($this->methods as $name => $info) : ?>
 
-### <?= $this->classShortName ?>::<?= $name ?>  
+### <?= $this->className ?>::<?= $name ?>
+
+<?= $info->shortDescription . "  \n" ?>
+<?= str_replace("\n", "  \n", $info->longDescription) ?>
+
 
 ```php
-<?= $info->visibility ?> <?= $name ?> (<?= join(', ', $info->argumentsList) ?: 'void' ?>)
+<?= $info->visibility ?> function <?= $name ?> (<?= count($info->argumentsList) ? '  ' . "\n    " . join(',  ' . "\n    ", $info->argumentsList) . "  \n" : '' ?>)<?php if (substr($name, 0, 2) !== '__' && count($info->returnValue)) : ?> : <?= count($info->returnValue) ? implode(', ', current($info->returnValue)->type) : 'null' ?> <?php endif; ?> <?php echo "  \n"; ?>
 ```
 
-**Description**
-
-<?= $info->shortDescription ?> 
-
-<?= str_replace("\n", "  \n", $info->longDescription) ?> 
-
-**Parameters**
-
-<?php if (!$info->argumentsDescription) : ?>
-`This function has no parameters.`
-<?php else : ?>
+<?php if ($info->argumentsDescription || count($info->returnValue)) : ?>
+|  | Type | Description |
+|-----|-----|-----|
+<?php if ($info->argumentsDescription) : ?>
 <?php foreach ($info->argumentsDescription as $param) : ?>
-`(<?= join('|', $param->type) ?>) <?= $param->name ?>`
-<?php if ($param->desc) : ?>
-: <?= str_replace("\n", "  \n", $param->desc) ?>  
-<?php endif ?>
+| `<?= $param->name ?>` | <?= join(', ', array_map(function ($v) { $str = '`' . $v . '`'; if (in_array($str, $this->classes)) { $str .= '*'; } return $str; }, $param->type)) ?> | <?= str_replace("\n", "  \n", $param->desc) ?> |
 <?php endforeach ?>
 <?php endif ?>
+<?php if (substr($name, 0, 2) !== '__' && count($info->returnValue)) : ?>
+|  |  |  |
+| `return` | <?= count($info->returnValue) ? implode(', ', array_map(function ($v) { $str = '`' . $v . '`'; if (isset($this->classes[$v])) { $str = '['.$str.']('.$this->classes[$v].')'; } return $str; }, current($info->returnValue)->type)) : 'null' ?> | <?= count($info->returnValue) ? str_replace("\n", "  \n", current($info->returnValue)->desc) : 'null' ?> |
+<?php endif; ?>
+<?php endif; ?>
 
-**Return Values**
-
-<?php foreach ($info->returnValue as $param) : ?>
-`<?= join('|', $param->type) ?>`
-
-<?php if ($param->desc) : ?>
-> <?= str_replace("\n", "  \n", $param->desc) ?>  
-<?php endif ?>
-
-<?php endforeach ?>
-
+---
 
 <?php endforeach ?>

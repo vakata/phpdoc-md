@@ -45,7 +45,9 @@ class ClassParser
                     ]
                 ),
             ];
-            $methods[$method->getName()] = (object)$data;
+            if (strlen($data['shortDescription'])) {
+                $methods[$method->getName()] = (object)$data;
+            }
 
         }
 
